@@ -22,6 +22,7 @@ import org.thoughtcrime.securesms.components.location.SignalPlace
 import org.thoughtcrime.securesms.contactshare.Contact
 import org.thoughtcrime.securesms.contactshare.ContactShareEditActivity
 import org.thoughtcrime.securesms.conversation.MessageSendType
+import org.thoughtcrime.securesms.conversation.NewTestActivity
 import org.thoughtcrime.securesms.conversation.colors.ChatColors
 import org.thoughtcrime.securesms.conversation.v2.ConversationActivityResultContracts.Callbacks
 import org.thoughtcrime.securesms.giph.ui.GiphyActivity
@@ -71,7 +72,8 @@ class ConversationActivityResultContracts(private val fragment: Fragment, privat
   }
 
   fun launchGallery(recipientId: RecipientId, text: CharSequence?, isReply: Boolean) {
-    mediaGalleryLauncher.launch(MediaSelectionInput(emptyList(), recipientId, text, isReply))
+    //mediaGalleryLauncher.launch(MediaSelectionInput(emptyList(), recipientId, text, isReply))
+    fragment.startActivity(Intent(fragment.requireContext(),NewTestActivity::class.java))
   }
 
   fun launchCamera(recipientId: RecipientId, isReply: Boolean) {
