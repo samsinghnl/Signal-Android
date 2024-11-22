@@ -725,9 +725,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.thoughtcrime.securesms.MainActivity" />
         </activity>
-        <activity
-            android:name=".conversation.NewTestActivity"
-            android:exported="false" />
+        <activity android:name=".conversation.NewTestActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="testapp"
+                    android:host="open.activity"
+                    android:pathPattern="/test" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".conversation.BubbleConversationActivity"

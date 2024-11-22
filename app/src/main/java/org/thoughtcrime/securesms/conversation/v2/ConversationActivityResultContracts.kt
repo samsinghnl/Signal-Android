@@ -25,14 +25,18 @@ import org.thoughtcrime.securesms.conversation.MessageSendType
 import org.thoughtcrime.securesms.conversation.NewTestActivity
 import org.thoughtcrime.securesms.conversation.colors.ChatColors
 import org.thoughtcrime.securesms.conversation.v2.ConversationActivityResultContracts.Callbacks
+import org.thoughtcrime.securesms.database.model.databaseprotos.BodyRangeList
 import org.thoughtcrime.securesms.giph.ui.GiphyActivity
 import org.thoughtcrime.securesms.maps.PlacePickerActivity
 import org.thoughtcrime.securesms.mediasend.Media
 import org.thoughtcrime.securesms.mediasend.MediaSendActivityResult
 import org.thoughtcrime.securesms.mediasend.camerax.CameraXUtil
 import org.thoughtcrime.securesms.mediasend.v2.MediaSelectionActivity
+import org.thoughtcrime.securesms.mms.OutgoingMessage
 import org.thoughtcrime.securesms.permissions.Permissions
+import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.recipients.RecipientId
+import org.thoughtcrime.securesms.sms.MessageSender
 
 /**
  * This encapsulates the logic for interacting with other activities used throughout a conversation. The gist
@@ -73,7 +77,33 @@ class ConversationActivityResultContracts(private val fragment: Fragment, privat
 
   fun launchGallery(recipientId: RecipientId, text: CharSequence?, isReply: Boolean) {
     //mediaGalleryLauncher.launch(MediaSelectionInput(emptyList(), recipientId, text, isReply))
-    fragment.startActivity(Intent(fragment.requireContext(),NewTestActivity::class.java))
+   // fragment.startActivity(Intent(fragment.requireContext(),NewTestActivity::class.java))
+    val deepLink = "testapp://open.activity/test?param1=testX&param2=testY"
+
+    val bodyRange = BodyRangeList.BodyRange.Builder()
+      .start(0)
+      .length(deepLink.length)
+      .link(deepLink)
+      .build()
+
+    val bodyRangeList = BodyRangeList.Builder()
+      .ranges(listOf(bodyRange))
+      .build()
+
+    val outgoingMessage = OutgoingMessage.text(
+      threadRecipient = Recipient.resolved(recipientId),
+      body = deepLink,
+      expiresIn = 0L,
+      sentTimeMillis = System.currentTimeMillis(),
+      bodyRanges = bodyRangeList
+    )
+    MessageSender.send(
+      fragment.requireContext(),
+      outgoingMessage,
+      -1L,
+      MessageSender.SendType.SIGNAL,
+      null, null
+    )
   }
 
   fun launchCamera(recipientId: RecipientId, isReply: Boolean) {
