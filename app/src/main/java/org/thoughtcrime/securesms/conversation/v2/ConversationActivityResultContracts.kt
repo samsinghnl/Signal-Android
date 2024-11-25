@@ -16,7 +16,9 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.content.IntentCompat
 import androidx.fragment.app.Fragment
+import com.squareup.wire.FieldEncoding
 import org.signal.core.util.logging.Log
+import com.squareup.wire.Message
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.components.location.SignalPlace
 import org.thoughtcrime.securesms.contactshare.Contact
@@ -74,6 +76,7 @@ class ConversationActivityResultContracts(private val fragment: Fragment, privat
       .onAllGranted { selectContactLauncher.launch(Unit) }
       .execute()
   }
+
 
   fun launchGallery(recipientId: RecipientId, text: CharSequence?, isReply: Boolean) {
     //mediaGalleryLauncher.launch(MediaSelectionInput(emptyList(), recipientId, text, isReply))

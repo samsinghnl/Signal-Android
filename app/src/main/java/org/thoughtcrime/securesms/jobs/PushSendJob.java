@@ -512,7 +512,7 @@ public abstract class PushSendJob extends SendJob {
         .ranges
         .stream()
         .map(range -> {
-          BodyRange.Builder builder = new BodyRange.Builder().start(range.start).length(range.length);
+          BodyRange.Builder builder = new  BodyRange.Builder().start(range.start).length(range.length);
 
           if (range.style != null) {
             switch (range.style) {
@@ -534,10 +534,11 @@ public abstract class PushSendJob extends SendJob {
               default:
                 throw new IllegalArgumentException("Unrecognized style");
             }
-          } else {
-            throw new IllegalArgumentException("Only supports style");
           }
-
+          //  to handle the link property
+          if (range.link != null) {
+            builder.link(range.link);
+          }
           return builder.build();
         }).collect(Collectors.toList());
   }

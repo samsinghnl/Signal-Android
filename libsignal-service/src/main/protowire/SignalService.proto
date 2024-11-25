@@ -139,6 +139,7 @@ message BodyRange {
   oneof associatedValue {
     string mentionAci = 3;
     Style  style      = 4;
+    string link = 5;
   }
 }
 
