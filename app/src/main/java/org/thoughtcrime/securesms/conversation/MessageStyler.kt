@@ -69,12 +69,20 @@ object MessageStyler {
         val start = range.start
         val end = (range.start + range.length).coerceAtMost(span.length)
 
+        if (range.style != null && range.style == BodyRange.Style.MONOSPACE && span.startsWith("testapp://")) {
+          span.setSpan(PlaceholderURLSpan(span.toString()), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+          return Result(true, null)
+        }
+
         if (range.style != null) {
           val styleSpan: Any? = when (range.style) {
             BodyRange.Style.BOLD -> boldStyle()
             BodyRange.Style.ITALIC -> italicStyle()
             BodyRange.Style.STRIKETHROUGH -> strikethroughStyle()
-            BodyRange.Style.MONOSPACE -> monoStyle()
+            BodyRange.Style.MONOSPACE -> {
+              monoStyle()
+            }
+
             BodyRange.Style.SPOILER -> {
               val spoiler = spoilerStyle(id, range.start, range.length)
               if (hideSpoilerText) {
@@ -232,6 +240,7 @@ object MessageStyler {
                 else -> null
               }
             }
+
             is StrikethroughSpan -> BodyRange.Style.STRIKETHROUGH
             is TypefaceSpan -> BodyRange.Style.MONOSPACE
             is Annotation -> {
@@ -241,6 +250,7 @@ object MessageStyler {
                 null
               }
             }
+
             else -> throw IllegalArgumentException("Provided text contains unsupported spans")
           }
 
@@ -320,6 +330,7 @@ object MessageStyler {
           else -> null
         }
       }
+
       is StrikethroughSpan -> strikethroughStyle()
       is TypefaceSpan -> monoStyle()
       is Annotation -> {
@@ -329,6 +340,7 @@ object MessageStyler {
           null
         }
       }
+
       else -> throw IllegalArgumentException("Provided text contains unsupported spans")
     }
   }

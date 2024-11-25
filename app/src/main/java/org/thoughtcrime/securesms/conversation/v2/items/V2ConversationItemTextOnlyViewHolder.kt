@@ -42,6 +42,7 @@ import org.thoughtcrime.securesms.conversation.v2.computed.FormattedDate
 import org.thoughtcrime.securesms.conversation.v2.data.ConversationMessageElement
 import org.thoughtcrime.securesms.database.model.MessageRecord
 import org.thoughtcrime.securesms.database.model.MmsMessageRecord
+import org.thoughtcrime.securesms.database.model.databaseprotos.BodyRangeList
 import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.recipients.Recipient
@@ -402,6 +403,7 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
 
     val record = conversationMessage.messageRecord
     var styledText: Spannable = conversationMessage.getDisplayBody(context)
+
     if (conversationContext.isMessageRequestAccepted) {
       linkifyMessageBody(styledText)
     }
@@ -425,9 +427,9 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
     binding.body.text = bodyText
   }
 
+
   private fun linkifyMessageBody(messageBody: Spannable) {
     V2ConversationItemUtils.linkifyUrlLinks(messageBody, conversationContext.selectedItems.isEmpty(), conversationContext.clickListener::onUrlClicked)
-
     if (conversationMessage.hasStyleLinks()) {
       messageBody.getSpans(0, messageBody.length, PlaceholderURLSpan::class.java).forEach { placeholder ->
         val start = messageBody.getSpanStart(placeholder)
@@ -435,10 +437,10 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
         val span: URLSpan = InterceptableLongClickCopyLinkSpan(
           placeholder.value,
           conversationContext.clickListener::onUrlClicked,
-          ContextCompat.getColor(getContext(), R.color.signal_accent_primary),
-          false
+          ContextCompat.getColor(getContext(), R.color.black),
+          true
         )
-
+        //R.color.signal_accent_primary
         messageBody.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
       }
     }
@@ -744,15 +746,19 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
       conversationContext.selectedItems.isNotEmpty() -> {
         conversationContext.clickListener.onItemClick(getMultiselectPartForLatestTouch())
       }
+
       messageRecord.isFailed -> {
         conversationContext.clickListener.onMessageWithErrorClicked(messageRecord)
       }
+
       messageRecord.isRateLimited && SignalStore.rateLimit.needsRecaptcha() -> {
         conversationContext.clickListener.onMessageWithRecaptchaNeededClicked(messageRecord)
       }
+
       messageRecord.isOutgoing && messageRecord.isIdentityMismatchFailure -> {
         conversationContext.clickListener.onIncomingIdentityMismatchClicked(messageRecord.fromRecipient.id)
       }
+
       else -> {
         conversationContext.clickListener.onItemClick(getMultiselectPartForLatestTouch())
       }

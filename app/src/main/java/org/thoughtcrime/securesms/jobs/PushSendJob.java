@@ -16,8 +16,7 @@ import androidx.annotation.Nullable;
 import com.annimon.stream.Stream;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
+import org.signal.core.util.Base64;
 import org.signal.core.util.Hex;
 import org.signal.core.util.logging.Log;
 import org.signal.libsignal.metadata.certificate.InvalidCertificateException;
@@ -61,11 +60,10 @@ import org.thoughtcrime.securesms.recipients.RecipientId;
 import org.thoughtcrime.securesms.recipients.RecipientUtil;
 import org.thoughtcrime.securesms.transport.RetryLaterException;
 import org.thoughtcrime.securesms.transport.UndeliverableMessageException;
-import org.signal.core.util.Base64;
 import org.thoughtcrime.securesms.util.BitmapDecodingException;
-import org.thoughtcrime.securesms.util.RemoteConfig;
 import org.thoughtcrime.securesms.util.ImageCompressionUtil;
 import org.thoughtcrime.securesms.util.MediaUtil;
+import org.thoughtcrime.securesms.util.RemoteConfig;
 import org.thoughtcrime.securesms.util.Util;
 import org.whispersystems.signalservice.api.messages.SignalServiceAttachment;
 import org.whispersystems.signalservice.api.messages.SignalServiceAttachmentPointer;
@@ -90,7 +88,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -113,7 +110,8 @@ public abstract class PushSendJob extends SendJob {
         timeSinceAciSignedPreKeyRotation < 0 ||
         timeSincePniSignedPreKeyRotation > PreKeysSyncJob.MAXIMUM_ALLOWED_SIGNED_PREKEY_AGE ||
         timeSincePniSignedPreKeyRotation < 0
-    ) {
+    )
+    {
       warn(TAG, "It's been too long since rotating our signed prekeys (ACI: " + timeSinceAciSignedPreKeyRotation + " ms, PNI: " + timeSincePniSignedPreKeyRotation + " ms)! Attempting to rotate now.");
 
       Optional<JobTracker.JobState> state = AppDependencies.getJobManager().runSynchronously(PreKeysSyncJob.create(), TimeUnit.SECONDS.toMillis(30));
@@ -162,7 +160,7 @@ public abstract class PushSendJob extends SendJob {
       return false;
     }
 
-    return exception instanceof IOException         ||
+    return exception instanceof IOException ||
            exception instanceof RetryLaterException ||
            exception instanceof ProofRequiredException;
   }
@@ -322,9 +320,9 @@ public abstract class PushSendJob extends SendJob {
   }
 
   protected static void notifyMediaMessageDeliveryFailed(Context context, long messageId) {
-    long                     threadId           = SignalDatabase.messages().getThreadIdForMessage(messageId);
-    Recipient                recipient          = SignalDatabase.threads().getRecipientForThreadId(threadId);
-    ParentStoryId.GroupReply groupReplyStoryId  = SignalDatabase.messages().getParentStoryIdForGroupReply(messageId);
+    long                     threadId          = SignalDatabase.messages().getThreadIdForMessage(messageId);
+    Recipient                recipient         = SignalDatabase.threads().getRecipientForThreadId(threadId);
+    ParentStoryId.GroupReply groupReplyStoryId = SignalDatabase.messages().getParentStoryIdForGroupReply(messageId);
 
     boolean isStory = false;
     try {
@@ -352,18 +350,18 @@ public abstract class PushSendJob extends SendJob {
       return Optional.of(new SignalServiceDataMessage.Quote(0, ACI.UNKNOWN, "", null, null, SignalServiceDataMessage.Quote.Type.NORMAL, null));
     }
 
-    long                                                  quoteId              = message.getOutgoingQuote().getId();
-    String                                                quoteBody            = message.getOutgoingQuote().getText();
-    RecipientId                                           quoteAuthor          = message.getOutgoingQuote().getAuthor();
-    List<SignalServiceDataMessage.Mention>                quoteMentions        = getMentionsFor(message.getOutgoingQuote().getMentions());
-    List<BodyRange>                                       bodyRanges           = getBodyRanges(message.getOutgoingQuote().getBodyRanges());
-    QuoteModel.Type                                       quoteType            = message.getOutgoingQuote().getType();
-    List<SignalServiceDataMessage.Quote.QuotedAttachment> quoteAttachments     = new LinkedList<>();
-    Optional<Attachment>                                  localQuoteAttachment = message.getOutgoingQuote()
-                                                                                        .getAttachments()
-                                                                                        .stream()
-                                                                                        .filter(a -> !MediaUtil.isViewOnceType(a.contentType))
-                                                                                        .findFirst();
+    long                                                  quoteId          = message.getOutgoingQuote().getId();
+    String                                                quoteBody        = message.getOutgoingQuote().getText();
+    RecipientId                                           quoteAuthor      = message.getOutgoingQuote().getAuthor();
+    List<SignalServiceDataMessage.Mention>                quoteMentions    = getMentionsFor(message.getOutgoingQuote().getMentions());
+    List<BodyRange>                                       bodyRanges       = getBodyRanges(message.getOutgoingQuote().getBodyRanges());
+    QuoteModel.Type                                       quoteType        = message.getOutgoingQuote().getType();
+    List<SignalServiceDataMessage.Quote.QuotedAttachment> quoteAttachments = new LinkedList<>();
+    Optional<Attachment> localQuoteAttachment = message.getOutgoingQuote()
+                                                       .getAttachments()
+                                                       .stream()
+                                                       .filter(a -> !MediaUtil.isViewOnceType(a.contentType))
+                                                       .findFirst();
 
     if (localQuoteAttachment.isPresent()) {
       Attachment attachment = localQuoteAttachment.get();
@@ -460,8 +458,8 @@ public abstract class PushSendJob extends SendJob {
           attachment = getAttachmentFor(contact.getAvatar());
         }
         avatar = SharedContact.Avatar.newBuilder().withAttachment(attachment)
-                                                  .withProfileFlag(contact.getAvatar().isProfile())
-                                                  .build();
+                                     .withProfileFlag(contact.getAvatar().isProfile())
+                                     .build();
       }
 
       builder.setAvatar(avatar);
@@ -512,7 +510,7 @@ public abstract class PushSendJob extends SendJob {
         .ranges
         .stream()
         .map(range -> {
-          BodyRange.Builder builder = new  BodyRange.Builder().start(range.start).length(range.length);
+          BodyRange.Builder builder = new BodyRange.Builder().start(range.start).length(range.length);
 
           if (range.style != null) {
             switch (range.style) {
@@ -534,10 +532,6 @@ public abstract class PushSendJob extends SendJob {
               default:
                 throw new IllegalArgumentException("Unrecognized style");
             }
-          }
-          //  to handle the link property
-          if (range.link != null) {
-            builder.link(range.link);
           }
           return builder.build();
         }).collect(Collectors.toList());

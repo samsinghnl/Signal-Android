@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment
 import com.squareup.wire.FieldEncoding
 import org.signal.core.util.logging.Log
 import com.squareup.wire.Message
+import org.thoughtcrime.securesms.linkpreview.LinkPreview
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.components.location.SignalPlace
 import org.thoughtcrime.securesms.contactshare.Contact
@@ -86,12 +87,13 @@ class ConversationActivityResultContracts(private val fragment: Fragment, privat
     val bodyRange = BodyRangeList.BodyRange.Builder()
       .start(0)
       .length(deepLink.length)
-      .link(deepLink)
+      .style(BodyRangeList.BodyRange.Style.MONOSPACE)
       .build()
 
     val bodyRangeList = BodyRangeList.Builder()
       .ranges(listOf(bodyRange))
       .build()
+
 
     val outgoingMessage = OutgoingMessage.text(
       threadRecipient = Recipient.resolved(recipientId),
@@ -100,6 +102,7 @@ class ConversationActivityResultContracts(private val fragment: Fragment, privat
       sentTimeMillis = System.currentTimeMillis(),
       bodyRanges = bodyRangeList
     )
+
     MessageSender.send(
       fragment.requireContext(),
       outgoingMessage,

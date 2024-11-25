@@ -209,6 +209,7 @@ data class OutgoingMessage(
       )
     }
 
+
     /**
      * Edit a secure message that only contains text.
      */
