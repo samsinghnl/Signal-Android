@@ -4,14 +4,25 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
     <include layout="@layout/system_ui_guidelines" />
 
-    <TextView
+    <EditText
+        android:id="@+id/chat_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="please type here"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/send_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Hello World"/>
+        android:text="Send"
+        tools:ignore="HardcodedText" />
 
 </LinearLayout>

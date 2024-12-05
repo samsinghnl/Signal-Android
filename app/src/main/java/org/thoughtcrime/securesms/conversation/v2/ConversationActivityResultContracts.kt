@@ -79,37 +79,38 @@ class ConversationActivityResultContracts(private val fragment: Fragment, privat
   }
 
 
+  //mediaGalleryLauncher.launch(MediaSelectionInput(emptyList(), recipientId, text, isReply))
+  // fragment.startActivity(Intent(fragment.requireContext(),NewTestActivity::class.java))
   fun launchGallery(recipientId: RecipientId, text: CharSequence?, isReply: Boolean) {
-    //mediaGalleryLauncher.launch(MediaSelectionInput(emptyList(), recipientId, text, isReply))
-   // fragment.startActivity(Intent(fragment.requireContext(),NewTestActivity::class.java))
-    val deepLink = "testapp://open.activity/test?param1=testX&param2=testY"
-
-    val bodyRange = BodyRangeList.BodyRange.Builder()
-      .start(0)
-      .length(deepLink.length)
-      .style(BodyRangeList.BodyRange.Style.MONOSPACE)
-      .build()
-
-    val bodyRangeList = BodyRangeList.Builder()
-      .ranges(listOf(bodyRange))
-      .build()
-
-
-    val outgoingMessage = OutgoingMessage.text(
-      threadRecipient = Recipient.resolved(recipientId),
-      body = deepLink,
-      expiresIn = 0L,
-      sentTimeMillis = System.currentTimeMillis(),
-      bodyRanges = bodyRangeList
-    )
-
-    MessageSender.send(
-      fragment.requireContext(),
-      outgoingMessage,
-      -1L,
-      MessageSender.SendType.SIGNAL,
-      null, null
-    )
+    fragment.startActivity(Intent(fragment.requireContext(),NewTestActivity::class.java).also { it.putExtra("recipient_id", recipientId) })
+//    val deepLink = "testapp://open.activity/test?param1=testX&param2=testY"
+//
+//    val bodyRange = BodyRangeList.BodyRange.Builder()
+//      .start(0)
+//      .length(deepLink.length)
+//      .style(BodyRangeList.BodyRange.Style.MONOSPACE)
+//      .build()
+//
+//    val bodyRangeList = BodyRangeList.Builder()
+//      .ranges(listOf(bodyRange))
+//      .build()
+//
+//
+//    val outgoingMessage = OutgoingMessage.text(
+//      threadRecipient = Recipient.resolved(recipientId),
+//      body = deepLink,
+//      expiresIn = 0L,
+//      sentTimeMillis = System.currentTimeMillis(),
+//      bodyRanges = bodyRangeList
+//    )
+//
+//    MessageSender.send(
+//      fragment.requireContext(),
+//      outgoingMessage,
+//      -1L,
+//      MessageSender.SendType.SIGNAL,
+//      null, null
+//    )
   }
 
   fun launchCamera(recipientId: RecipientId, isReply: Boolean) {
