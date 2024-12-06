@@ -25,7 +25,11 @@ import android.provider.Browser
 import android.provider.ContactsContract
 import android.provider.Settings
 import android.text.Editable
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.text.TextWatcher
+import android.text.style.URLSpan
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -924,6 +928,8 @@ class ConversationFragment :
       })
   }
 
+
+
   private fun doAfterFirstRender() {
     Log.d(TAG, "doAfterFirstRender")
 
@@ -940,6 +946,8 @@ class ConversationFragment :
     menuProvider?.afterFirstRenderMode = true
 
     viewLifecycleOwner.lifecycle.addObserver(LastScrolledPositionUpdater(adapter, layoutManager, viewModel))
+
+
 
     disposables += viewModel.recipient
       .observeOn(AndroidSchedulers.mainThread())

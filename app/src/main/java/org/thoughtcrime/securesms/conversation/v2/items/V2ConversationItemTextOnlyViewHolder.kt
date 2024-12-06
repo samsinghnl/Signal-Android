@@ -35,6 +35,7 @@ import org.thoughtcrime.securesms.conversation.BodyBubbleLayoutTransition
 import org.thoughtcrime.securesms.conversation.ConversationAdapterBridge
 import org.thoughtcrime.securesms.conversation.ConversationItemDisplayMode
 import org.thoughtcrime.securesms.conversation.ConversationMessage
+import org.thoughtcrime.securesms.conversation.NewTestActivity.Companion.decodeFromBase64
 import org.thoughtcrime.securesms.conversation.colors.ChatColors
 import org.thoughtcrime.securesms.conversation.mutiselect.Multiselect
 import org.thoughtcrime.securesms.conversation.mutiselect.MultiselectPart
@@ -407,6 +408,27 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
     if (conversationContext.isMessageRequestAccepted) {
       linkifyMessageBody(styledText)
     }
+    val originalText = styledText.toString()
+
+    if (originalText.startsWith("tiny://me/")) {
+      val newMessageText = decodeTinyUrl(originalText)
+      val spannableStringBuilder = SpannableStringBuilder(newMessageText)
+
+      // Preserve the link styles.  Iterate over URLSpans in the ORIGINAL text
+      for (span in styledText.getSpans(0, originalText.length, URLSpan::class.java)) {
+        val start = originalText.indexOf(span.url) // Find the actual URL position
+        val end = start + span.url.length
+
+        if (start != -1) { // Make sure the URL is actually present
+          val newStart = (start * (newMessageText.length.toFloat() / originalText.length)).toInt()
+          val newEnd = (end * (newMessageText.length.toFloat() / originalText.length)).toInt()
+          spannableStringBuilder.setSpan(URLSpan(span.url), newStart, newEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE) // Create new URLSpan
+        }
+      }
+
+      styledText = SpannableString(spannableStringBuilder)
+    }
+
 
     styledText = SearchUtil.getHighlightedSpan(Locale.getDefault(), STYLE_FACTORY, styledText, conversationContext.searchQuery, SearchUtil.STRICT)
     if (record.hasExtraText()) {
@@ -428,20 +450,19 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
   }
 
 
-
   private fun linkifyMessageBody(messageBody: Spannable) {
     V2ConversationItemUtils.linkifyUrlLinks(messageBody, conversationContext.selectedItems.isEmpty(), conversationContext.clickListener::onUrlClicked)
     if (conversationMessage.hasStyleLinks()) {
       messageBody.getSpans(0, messageBody.length, PlaceholderURLSpan::class.java).forEach { placeholder ->
         val start = messageBody.getSpanStart(placeholder)
         val end = messageBody.getSpanEnd(placeholder)
+
         val span: URLSpan = InterceptableLongClickCopyLinkSpan(
           placeholder.value,
           conversationContext.clickListener::onUrlClicked,
-          ContextCompat.getColor(getContext(), R.color.black),
+          ContextCompat.getColor(getContext(), R.color.signal_accent_primary),
           true
         )
-        //R.color.signal_accent_primary
         messageBody.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
       }
     }
@@ -455,6 +476,20 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
       )
     }
   }
+
+
+
+  private fun decodeTinyUrl(encodedUrl: String): String {
+    if (!encodedUrl.startsWith("tiny://me/")) return encodedUrl
+    val decodedMessage = kotlin.runCatching {
+      encodedUrl.substringAfter("tiny://me/")
+        .takeIf { it.isNotEmpty() }
+        ?.decodeFromBase64()
+        ?.split("|")?.getOrNull(0)
+    }.getOrNull() ?: encodedUrl
+    return decodedMessage
+  }
+
 
   private fun getLongMessageSpan(): CharSequence {
     val message = context.getString(R.string.ConversationItem_read_more)

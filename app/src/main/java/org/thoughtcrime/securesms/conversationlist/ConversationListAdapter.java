@@ -1,5 +1,6 @@
 package org.thoughtcrime.securesms.conversationlist;
 
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import org.thoughtcrime.securesms.BindableConversationListItem;
 import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.conversationlist.model.Conversation;
 import org.thoughtcrime.securesms.conversationlist.model.ConversationSet;
+import org.thoughtcrime.securesms.database.model.ThreadRecord;
 import org.thoughtcrime.securesms.util.CachedInflater;
 import org.thoughtcrime.securesms.util.ViewUtil;
 
@@ -154,14 +156,27 @@ class ConversationListAdapter extends ListAdapter<Conversation, RecyclerView.Vie
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
     if (holder.getItemViewType() == TYPE_ACTION || holder.getItemViewType() == TYPE_THREAD) {
       ConversationViewHolder casted       = (ConversationViewHolder) holder;
-      Conversation           conversation = Objects.requireNonNull(getItem(position));
+      Conversation conversation = Objects.requireNonNull(getItem(position));
 
-      casted.getConversationListItem().bind(lifecycleOwner,
-                                            conversation.getThreadRecord(),
-                                            requestManager,
-                                            Locale.getDefault(),
-                                            typingSet,
-                                            selectedConversations);
+      boolean hasTinyDeepLink = conversation.getThreadRecord().getBody().startsWith("tiny://me/");
+      if(hasTinyDeepLink){
+        ThreadRecord threadRecord = conversation.getThreadRecord();
+        String decodedMsg = decodeTinyUrl(conversation.getThreadRecord().getBody());
+        threadRecord.setBody(decodedMsg);
+        casted.getConversationListItem().bind(lifecycleOwner,
+                                              threadRecord,
+                                              requestManager,
+                                              Locale.getDefault(),
+                                              typingSet,
+                                              selectedConversations);
+      }else {
+        casted.getConversationListItem().bind(lifecycleOwner,
+                                              conversation.getThreadRecord(),
+                                              requestManager,
+                                              Locale.getDefault(),
+                                              typingSet,
+                                              selectedConversations);
+      }
     } else if (holder.getItemViewType() == TYPE_HEADER) {
       HeaderViewHolder casted       = (HeaderViewHolder) holder;
       Conversation     conversation = Objects.requireNonNull(getItem(position));
@@ -181,6 +196,21 @@ class ConversationListAdapter extends ListAdapter<Conversation, RecyclerView.Vie
 
       casted.bind(conversation);
     }
+  }
+
+  private String decodeTinyUrl(String encodedUrl) {
+    try {
+      String decodedMessage = encodedUrl.substring(encodedUrl.indexOf("tiny://me/") + "tiny://me/".length());
+      if (!decodedMessage.isEmpty()) {
+        String[] parts = new String(Base64.decode(decodedMessage, Base64.DEFAULT)).split("\\|");
+        if (parts.length > 0) {
+          return parts[0];
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return encodedUrl;
   }
 
   @Override

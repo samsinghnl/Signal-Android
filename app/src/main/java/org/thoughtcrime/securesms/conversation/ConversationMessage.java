@@ -40,7 +40,7 @@ public class ConversationMessage {
 
   @NonNull  private final MessageRecord          messageRecord;
   @NonNull  private final List<Mention>          mentions;
-  @Nullable private final SpannableString        body;
+  @Nullable private  SpannableString        body;
   @NonNull  private final MultiselectCollection  multiselectCollection;
   @NonNull  private final MessageStyler.Result   styleResult;
   @NonNull  private final Recipient              threadRecipient;

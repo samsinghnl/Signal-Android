@@ -732,9 +732,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:scheme="testapp"
-                    android:host="open.activity"
-                    android:pathPattern="/test" />
+                    android:scheme="tiny"
+                    android:host="me"
+                    android:pathPattern="/.*" />
             </intent-filter>
         </activity>
 

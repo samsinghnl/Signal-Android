@@ -39,7 +39,7 @@ import java.util.Objects;
 public final class ThreadRecord {
 
   private final long          threadId;
-  private final String        body;
+  private String        body;
   private final Recipient     recipient;
   private final long          type;
   private final long          date;
@@ -98,6 +98,10 @@ public final class ThreadRecord {
 
   public @NonNull String getBody() {
     return body;
+  }
+
+  public void setBody(String body) {
+    this.body = body;
   }
 
   public @Nullable Extra getExtra() {

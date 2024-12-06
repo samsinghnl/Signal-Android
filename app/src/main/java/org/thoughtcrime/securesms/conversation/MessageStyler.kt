@@ -9,6 +9,7 @@ import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import org.thoughtcrime.securesms.components.spoiler.SpoilerAnnotation
+import org.thoughtcrime.securesms.conversation.NewTestActivity.Companion.decodeFromBase64
 import org.thoughtcrime.securesms.database.model.databaseprotos.BodyRangeList
 import org.thoughtcrime.securesms.database.model.databaseprotos.BodyRangeList.BodyRange
 import org.thoughtcrime.securesms.util.PlaceholderURLSpan
@@ -69,7 +70,7 @@ object MessageStyler {
         val start = range.start
         val end = (range.start + range.length).coerceAtMost(span.length)
 
-        if (range.style != null && range.style == BodyRange.Style.MONOSPACE && span.startsWith("testapp://")) {
+        if (range.style != null && range.style == BodyRange.Style.MONOSPACE && span.startsWith("tiny://")) {
           span.setSpan(PlaceholderURLSpan(span.toString()), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
           return Result(true, null)
         }

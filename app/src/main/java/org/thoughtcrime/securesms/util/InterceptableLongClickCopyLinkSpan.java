@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 /**
  * Passes clicked Urls to the supplied {@link UrlClickHandler}.
  */
-public final class InterceptableLongClickCopyLinkSpan extends LongClickCopySpan {
+public class InterceptableLongClickCopyLinkSpan extends LongClickCopySpan {
 
   private final UrlClickHandler onClickListener;
 
