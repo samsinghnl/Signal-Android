@@ -112,12 +112,12 @@ class NewTestActivity : PassphraseRequiredActivity() {
       Toast.makeText(context, "message sent to chat!", Toast.LENGTH_SHORT).show()
     }
 
-     fun String.encodeToBase64(): String {
+    fun String.encodeToBase64(): String {
       return Base64.encodeToString(this.toByteArray(), Base64.URL_SAFE)
         .trim('=')
     }
 
-     fun String.decodeFromBase64(): String {
+    fun String.decodeFromBase64(): String {
       return Base64.decode(this, Base64.URL_SAFE).toString(Charset.defaultCharset())
     }
   }
